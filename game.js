@@ -181,6 +181,11 @@ function handleTravel() {
 
 // Function to update inventory display inside the game-events element
 function updateInventoryDisplay() {
+    let existingInventoryDisplay = document.getElementById('inventory-display');
+    if (existingInventoryDisplay) {
+        existingInventoryDisplay.parentNode.removeChild(existingInventoryDisplay);
+    }
+
     let inventoryDisplay = document.createElement('ul'); // Create a new ul element
     inventoryDisplay.id = 'inventory-display'; // Set an id for styling
     gameEventsElement.appendChild(inventoryDisplay); // Append the ul element to game-events
@@ -191,6 +196,7 @@ function updateInventoryDisplay() {
         inventoryDisplay.appendChild(listItem);
     }
 }
+
 
 
 
