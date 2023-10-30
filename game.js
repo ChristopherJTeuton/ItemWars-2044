@@ -1,4 +1,7 @@
 console.log("Script loaded");
+const POLICE_FINE_PROBABILITY = 0.05;
+const MUGGING_PROBABILITY = 0.1;
+const FINDING_MONEY_PROBABILITY = 0.15;
 document.addEventListener("DOMContentLoaded", function() {
     let playerName = prompt("Enter your character's name:");
     document.getElementById('player-name').textContent = `Player: ${playerName}`;
@@ -87,9 +90,10 @@ function populateDropdown(elementId, options, itemPrices) {
 }
 
 
-    function displayGameEvent(eventText) {
-        gameEventsElement.textContent = eventText;
-    }
+function displayGameEvent(eventText) {
+    window.alert(eventText);
+}
+
 
     function handleBuy() {
     let buySelectedItem = document.getElementById('buy-item-dropdown').value;
@@ -135,48 +139,51 @@ function populateDropdown(elementId, options, itemPrices) {
     }
 
     // Function to handle travel and update item prices when the player travels and display travel price and also have random events occur
+
 function handleTravel() {
     let travelCost = Math.floor(Math.random() * (151) + 50);
     let randomEvent = Math.random(); // Generate a random number to determine the event
 
-    if (randomEvent < 0.25) { // 5% chance for random event
-        // Police fine event
+    if (randomEvent < POLICE_FINE_PROBABILITY) {  // 5% chance for police fine event
         let fineAmount = Math.floor(money * 0.05); // 5% of total money
         money -= fineAmount;
         displayGameEvent(`You got pulled over by the police and were fined $${fineAmount}.`);
-    } else if (randomEvent < 0.21) { // 5% chance for mugging event
-        // Mugging event
+    } else if (randomEvent < MUGGING_PROBABILITY) { // 5% chance for mugging event
         let randomItem = Object.keys(inventory)[Math.floor(Math.random() * Object.keys(inventory).length)]; // Random item from inventory
         if (inventory[randomItem] > 0) {
             let lostQuantity = Math.floor(inventory[randomItem] * 0.2); // 20% of the item quantity
             inventory[randomItem] -= lostQuantity;
             displayGameEvent(`You got mugged by a stock broker and lost ${lostQuantity} ${randomItem}.`);
         }
-    } else if (randomEvent < 0.15) { // 5% chance for finding money event
-        // Finding money event
+} else if (randomEvent < FINDING_MONEY_PROBABILITY) { // 5% chance for finding money event
         let foundMoney = Math.floor(Math.random() * 100) + travelCost; // Random money between travel cost and 100
         money += foundMoney;
         displayGameEvent(`You found $${foundMoney} on the street!`);
+    } else {
+        // All other travel events will be displayed using displayGameEvent
+        displayGameEvent(`You traveled to ${city}! It cost you $${travelCost}.`);
     }
 
-    if (money >= travelCost) {
+    if (money >= travelCost && randomEvent >= 0.15) {
         money -= travelCost;
         city = cities[Math.floor(Math.random() * cities.length)];
         updateItemPrices(city);
-        displayGameEvent(`You traveled to ${city}! It cost you $${travelCost}.`);
         populateDropdown("buy-item-dropdown", Object.keys(itemPrices), itemPrices); // Update buy item dropdown
         populateDropdown("sell-item-dropdown", Object.keys(inventory), itemPrices); // Update sell item dropdown
         updateUI();
-    } else {
+    } else if (money < travelCost) {
         displayGameEvent(`Not enough money to travel. Travel cost: $${travelCost}`);
     }
 }
 
 
-//function to update inventory display
+
+
+// Function to update inventory display inside the game-events element
 function updateInventoryDisplay() {
-    let inventoryDisplay = document.getElementById('inventory-display');
-    inventoryDisplay.innerHTML = ''; // Clear existing inventory display
+    let inventoryDisplay = document.createElement('ul'); // Create a new ul element
+    inventoryDisplay.id = 'inventory-display'; // Set an id for styling
+    gameEventsElement.appendChild(inventoryDisplay); // Append the ul element to game-events
 
     for (let item in inventory) {
         let listItem = document.createElement('li');
@@ -184,6 +191,7 @@ function updateInventoryDisplay() {
         inventoryDisplay.appendChild(listItem);
     }
 }
+
 
 
 
