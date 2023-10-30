@@ -134,9 +134,30 @@ function populateDropdown(elementId, options, itemPrices) {
         }
     }
 
-    // Function to handle travel and update item prices when the player travels and display travel price
+    // Function to handle travel and update item prices when the player travels and display travel price and also have random events occur
 function handleTravel() {
     let travelCost = Math.floor(Math.random() * (151) + 50);
+    let randomEvent = Math.random(); // Generate a random number to determine the event
+
+    if (randomEvent < 0.25) { // 5% chance for random event
+        // Police fine event
+        let fineAmount = Math.floor(money * 0.05); // 5% of total money
+        money -= fineAmount;
+        displayGameEvent(`You got pulled over by the police and were fined $${fineAmount}.`);
+    } else if (randomEvent < 0.21) { // 5% chance for mugging event
+        // Mugging event
+        let randomItem = Object.keys(inventory)[Math.floor(Math.random() * Object.keys(inventory).length)]; // Random item from inventory
+        if (inventory[randomItem] > 0) {
+            let lostQuantity = Math.floor(inventory[randomItem] * 0.2); // 20% of the item quantity
+            inventory[randomItem] -= lostQuantity;
+            displayGameEvent(`You got mugged by a stock broker and lost ${lostQuantity} ${randomItem}.`);
+        }
+    } else if (randomEvent < 0.15) { // 5% chance for finding money event
+        // Finding money event
+        let foundMoney = Math.floor(Math.random() * 100) + travelCost; // Random money between travel cost and 100
+        money += foundMoney;
+        displayGameEvent(`You found $${foundMoney} on the street!`);
+    }
 
     if (money >= travelCost) {
         money -= travelCost;
@@ -150,6 +171,7 @@ function handleTravel() {
         displayGameEvent(`Not enough money to travel. Travel cost: $${travelCost}`);
     }
 }
+
 
 //function to update inventory display
 function updateInventoryDisplay() {
